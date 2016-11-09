@@ -59,6 +59,9 @@ namespace TemplateFactory
             this.combUpdateComponents.DrawMode = DrawMode.OwnerDrawVariable;
             this.combUpdateComponents.DrawItem += new DrawItemEventHandler(combUpdateComponents_DrawItem);
 
+            bindTemplatesUpdates();
+            bindComponentsUpdates();
+
         }
 
         #region 重绘ComboBox的高度
@@ -346,7 +349,7 @@ namespace TemplateFactory
 
             if (udTemplateSkins == null || udTemplateSkins.Count < 1)
             {
-                dic.Add("-1", "无模板更新");
+                dic.Add("-1", "请选择");
             }
             else
             {
@@ -356,6 +359,7 @@ namespace TemplateFactory
                     dic.Add(item.Code, $"{item.Config.Name}({item.Code})模板，共{item.Skins.Length}套皮肤");
                 }
             }
+            this.combUpdateTemplates.DataSource = null;
             this.combUpdateTemplates.Items.Clear();
             this.combUpdateTemplates.DataSource = new BindingSource(dic, null);
             this.combUpdateTemplates.DisplayMember = "value";
@@ -370,7 +374,7 @@ namespace TemplateFactory
             Dictionary<string, string> dic = new Dictionary<string, string>();
             if (udComponentStyles == null || udComponentStyles.Count < 1)
             {
-                dic.Add("-1", "无组件更新");
+                dic.Add("-1", "请选择");
             }
             else
             {
@@ -380,6 +384,7 @@ namespace TemplateFactory
                     dic.Add(item.Code, $"{item.Name}({item.Code})组件，共{item.Styles.Length}套风格");
                 }
             }
+            this.combUpdateComponents.DataSource = null;
             this.combUpdateComponents.Items.Clear();
             this.combUpdateComponents.DataSource = new BindingSource(dic, null);
             this.combUpdateComponents.DisplayMember = "value";
@@ -413,11 +418,10 @@ namespace TemplateFactory
             }
 
             string err = null;
-
+            bool success = false;
             try
             {
-                bool success = service.AddTemplates(data);
-                if (!success) throw new CustomException("更新模板失败！");
+                success = service.AddTemplates(data);
             }
             catch (CustomException ex)
             {
@@ -426,6 +430,19 @@ namespace TemplateFactory
             catch (Exception ex)
             {
                 err = $"程序异常，原因：{ex.Message}";
+            }
+            finally
+            {
+                if (success)
+                {
+                    var codes = data.Select(p => p.Code).ToArray();
+                    udTemplateSkins = udTemplateSkins.Where(p => !codes.Contains(p.Code)).ToList();
+                    bindTemplatesUpdates();
+                }
+                else
+                {
+                    err = "更新模板失败！";
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(err))
@@ -460,11 +477,11 @@ namespace TemplateFactory
                 data = udComponentStyles.Where(p => p.Code.Equals(compCode, StringComparison.OrdinalIgnoreCase)).ToList();
             }
             string err = null;
+            bool success = false;
 
             try
             {
-                bool success = service.AddComponents(data);
-                if (!success) throw new CustomException("更新组件失败！");
+                success = service.AddComponents(data);
             }
             catch (CustomException ex)
             {
@@ -473,6 +490,19 @@ namespace TemplateFactory
             catch (Exception ex)
             {
                 err = $"程序异常，原因：{ex.Message}";
+            }
+            finally
+            {
+                if (success)
+                {
+                    var codes = data.Select(p => p.Code).ToArray();
+                    udComponentStyles = udComponentStyles.Where(p => !codes.Contains(p.Code)).ToList();
+                    bindComponentsUpdates();
+                }
+                else
+                {
+                    err = "更新组件失败！";
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(err))
