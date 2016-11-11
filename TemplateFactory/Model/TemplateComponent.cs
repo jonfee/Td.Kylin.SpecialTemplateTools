@@ -12,5 +12,6 @@ namespace TemplateFactory.Model
         public int Index { get; set; }
         public long ComponentId { get; set; }
         public long StyleId { get; set; }
+        public string DefaultData { get; set; }
     }
 }

@@ -137,7 +137,8 @@ namespace TemplateFactory.Data
                             Index = p.Index,
                             PreviewImage = null,
                             TemplateComponentId = p.TempComponentId,
-                            TemplateId = item.Config.TemplateId
+                            TemplateId = item.Config.TemplateId,
+                            DefaultData = p.DefaultData
                         }).ToList();
 
                         if (components.Any()) inTempComponents.AddRange(components);
@@ -252,6 +253,7 @@ namespace TemplateFactory.Data
                         tc.ComponentStyleId = item.StyleId;
                         tc.PreviewImage = null;
                         tc.Index = item.Index;
+                        tc.DefaultData = item.DefaultData;
                     }
                     //加入组件更新区
                     if (upComps.Any()) upTempComponents.AddRange(upComps);
@@ -268,7 +270,8 @@ namespace TemplateFactory.Data
                         Index = p.Index,
                         PreviewImage = null,
                         TemplateComponentId = p.TempComponentId,
-                        TemplateId = temp.Config.TemplateId
+                        TemplateId = temp.Config.TemplateId,
+                        DefaultData = p.DefaultData
                     }).ToList();
                     //加入组件新增区
                     if (newComps.Any()) inTempComponents.AddRange(newComps);
