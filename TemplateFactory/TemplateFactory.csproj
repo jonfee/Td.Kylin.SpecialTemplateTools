@@ -277,7 +277,7 @@
   <ItemGroup>
     <Compile Include="Core\CustomException.cs" />
     <Compile Include="Core\FileReader.cs" />
-    <Compile Include="Core\FixTools.cs" />
+    <Compile Include="Data\Connect.cs" />
     <Compile Include="Data\DataContext.cs" />
     <Compile Include="Data\SpecialService.cs" />
     <Compile Include="MainForm.cs">

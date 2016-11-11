@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
 using System.Drawing;
 using System.IO;
@@ -36,11 +37,17 @@ namespace TemplateFactory
 
         Encoding encoding = Encoding.Default;
 
-        Dictionary<string, string[]> dbTemplateSkins = null;     //库中模板及皮肤
+        Dictionary<string, string[]> dbTemplateSkins = null;    //库中模板及皮肤
         Dictionary<string, string[]> dbComponentStyles = null;  //库中组件及风格
 
-        List<TemplateModel> udTemplateSkins = null;    //可更新的模板及皮肤
-        List<ComponentModel> udComponentStyles = null;  //可更新组件及风格
+        List<TemplateModel> localTemplateSkins = null;      //本地模板及皮肤
+        List<ComponentModel> localComponentStyles = null;   //本地组件及风格
+
+        List<TemplateModel> canInsertTemplateSkins = null;      //可入库的模板及皮肤
+        List<ComponentModel> canInsertComponentStyles = null;   //可入库的组件及风格
+
+        List<TemplateModel> canUpdateTemplateSkins = null;      //可更新的模板及皮肤
+        List<ComponentModel> canUpdateComponentStyles = null;   //可更新的组件及风格
 
         SpecialService service = null;  //数据操作服务实例
 
@@ -50,81 +57,242 @@ namespace TemplateFactory
         {
             InitializeComponent();
 
-            service = new SpecialService();
-
-            updateTemplateComponentInfo();
-
+            this.combDbLibs.DrawMode = DrawMode.OwnerDrawVariable;
+            this.combInsertTemplates.DrawMode = DrawMode.OwnerDrawVariable;
+            this.combInsertComponents.DrawMode = DrawMode.OwnerDrawVariable;
             this.combUpdateTemplates.DrawMode = DrawMode.OwnerDrawVariable;
-            this.combUpdateTemplates.DrawItem += new DrawItemEventHandler(combUpdateTemplates_DrawItem);
             this.combUpdateComponents.DrawMode = DrawMode.OwnerDrawVariable;
-            this.combUpdateComponents.DrawItem += new DrawItemEventHandler(combUpdateComponents_DrawItem);
+            this.combDbLibs.DrawItem += new DrawItemEventHandler(comboBox_DrawItem);
+            this.combInsertTemplates.DrawItem += new DrawItemEventHandler(comboBox_DrawItem);
+            this.combInsertComponents.DrawItem += new DrawItemEventHandler(comboBox_DrawItem);
+            this.combUpdateTemplates.DrawItem += new DrawItemEventHandler(comboBox_DrawItem);
+            this.combUpdateComponents.DrawItem += new DrawItemEventHandler(comboBox_DrawItem);
 
-            bindTemplatesUpdates();
-            bindComponentsUpdates();
+            this.btnCheckUpdate.Visible = false;
 
+            bindDbLib();
         }
 
         #region 重绘ComboBox的高度
 
         /// <summary>
-        /// combUpdateTemplates
+        /// comboBox_DrawItem
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void combUpdateTemplates_DrawItem(object sender, DrawItemEventArgs e)
+        void comboBox_DrawItem(object sender, DrawItemEventArgs e)
         {
-            if (e.Index < 0)
-            {
-                return;
-            }
-            e.DrawBackground();
-            e.DrawFocusRectangle();
-            e.Graphics.DrawString(combUpdateTemplates.GetItemText(combUpdateTemplates.Items[e.Index]).ToString(), e.Font, new SolidBrush(e.ForeColor), e.Bounds.X, e.Bounds.Y + 3);
-        }
+            ComboBox combo = (ComboBox)sender;
 
-        /// <summary>
-        /// combUpdateComponents
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void combUpdateComponents_DrawItem(object sender, DrawItemEventArgs e)
-        {
+            if (combo == null) return;
+
             if (e.Index < 0)
             {
                 return;
             }
             e.DrawBackground();
             e.DrawFocusRectangle();
-            e.Graphics.DrawString(combUpdateComponents.GetItemText(combUpdateComponents.Items[e.Index]).ToString(), e.Font, new SolidBrush(e.ForeColor), e.Bounds.X, e.Bounds.Y + 3);
+            e.Graphics.DrawString(combo.GetItemText(combo.Items[e.Index]).ToString(), e.Font, new SolidBrush(e.ForeColor), e.Bounds.X, e.Bounds.Y + 3);
         }
 
         #endregion
 
-        #region 初始化模板及组件信息
+        /// <summary>
+        /// 重绘窗体
+        /// </summary>
+        void formDraw()
+        {
+            checkData();
+            checkUI();
+        }
+
+        #region 绑定UI
 
         /// <summary>
-        /// 更新模板组件信息
+        /// 绑定目标库
         /// </summary>
-        void updateTemplateComponentInfo()
+        void bindDbLib()
         {
-            dbTemplateSkins = service.GetTemplatesSkins();
-            dbComponentStyles = service.GetComponentsStyles();
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            dic.Add("0", "请选择");
+
+            foreach (ConnectionStringSettings item in ConfigurationManager.ConnectionStrings)
+            {
+                if (item.Name == "LocalSqlServer") continue;
+                dic.Add(item.ConnectionString, item.Name);
+            }
+            this.combDbLibs.DataSource = new BindingSource(dic, null);
+            this.combDbLibs.DisplayMember = "value";
+            this.combDbLibs.ValueMember = "key";
+            this.combDbLibs.SelectedIndex = 0;
+        }
+
+        /// <summary>
+        /// 校正UI展示
+        /// </summary>
+        void checkUI()
+        {
+            bindCurrentInfo();
+            bindTemplatesInsert();
+            bindComponentsInsert();
+            bindTemplatesUpdate();
+            bindComponentsUpdate();
+        }
+
+        /// <summary>
+        /// 绑定当前库中模板及组件信息
+        /// </summary>
+        void bindCurrentInfo()
+        {
+            //当前库中模板及组件信息
+            int compCount = dbComponentStyles.Keys.Count();
+            int compStyleCount = dbComponentStyles.Values.Sum(p => p.Count());
+            this.lbComponents.Text = compCount.ToString();
+            this.lbStyles.Text = compStyleCount.ToString();
 
             int tempCount = dbTemplateSkins.Keys.Count();
             int tempSkinCount = dbTemplateSkins.Values.Sum(p => p.Count());
-
-            int compCount = dbComponentStyles.Keys.Count();
-            int compStyleCount = dbComponentStyles.Values.Sum(p => p.Count());
-
-            this.lbComponents.Text = compCount.ToString();
-            this.lbStyles.Text = compStyleCount.ToString();
             this.lbTemplates.Text = tempCount.ToString();
             this.lbSkins.Text = tempSkinCount.ToString();
+
+            //更新消息
+            int incompCount = canInsertComponentStyles.Count();
+            int incompStyleCount = canInsertComponentStyles.Sum(p => p.Styles.Count());
+            string inCompTips = incompCount > 0 ? $"有{incompCount}个组件，{incompStyleCount}套风格可以更新入库" : "已是最新！";
+            this.lbComponentsUpdateTips.Text = inCompTips;
+
+            int intempCount = canInsertTemplateSkins.Count();
+            int intempSkinCount = canInsertTemplateSkins.Sum(p => p.Skins.Count());
+            string inTempTips = intempCount > 0 ? $"有{intempCount}套模板，{intempSkinCount}套皮肤可以更新入库" : "已是最新！";
+            this.lbTemplateUpdateTips.Text = inTempTips;
+        }
+
+        /// <summary>
+        /// 绑定可入库的模板
+        /// </summary>
+        void bindTemplatesInsert()
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+
+            if (canInsertTemplateSkins == null || canInsertTemplateSkins.Count < 1)
+            {
+                dic.Add("-1", "请选择");
+            }
+            else
+            {
+                dic.Add("0", "全部可入库模板");
+                foreach (var item in canInsertTemplateSkins)
+                {
+                    dic.Add(item.Code, $"{item.Config.Name}({item.Code})模板，共{item.Skins.Length}套皮肤");
+                }
+            }
+            this.combInsertTemplates.DataSource = null;
+            this.combInsertTemplates.Items.Clear();
+            this.combInsertTemplates.DataSource = new BindingSource(dic, null);
+            this.combInsertTemplates.DisplayMember = "value";
+            this.combInsertTemplates.ValueMember = "key";
+        }
+
+        /// <summary>
+        /// 绑定可入库的组件
+        /// </summary>
+        void bindComponentsInsert()
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            if (canInsertComponentStyles == null || canInsertComponentStyles.Count < 1)
+            {
+                dic.Add("-1", "请选择");
+            }
+            else
+            {
+                dic.Add("0", "全部可更新组件");
+                foreach (var item in canInsertComponentStyles)
+                {
+                    dic.Add(item.Code, $"{item.Name}({item.Code})组件，共{item.Styles.Length}套风格");
+                }
+            }
+            this.combInsertComponents.DataSource = null;
+            this.combInsertComponents.Items.Clear();
+            this.combInsertComponents.DataSource = new BindingSource(dic, null);
+            this.combInsertComponents.DisplayMember = "value";
+            this.combInsertComponents.ValueMember = "key";
+        }
+
+        /// <summary>
+        /// 绑定可更新的模板
+        /// </summary>
+        void bindTemplatesUpdate()
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+
+            if (canUpdateTemplateSkins == null || canUpdateTemplateSkins.Count < 1)
+            {
+                dic.Add("-1", "请选择");
+            }
+            else
+            {
+                dic.Add("0", "全部可更新模板");
+                foreach (var item in canUpdateTemplateSkins)
+                {
+                    dic.Add(item.Code, $"{item.Config.Name}({item.Code})模板，共{item.Skins.Length}套皮肤");
+                }
+            }
+            this.combUpdateTemplates.DataSource = null;
+            this.combUpdateTemplates.Items.Clear();
+            this.combUpdateTemplates.DataSource = new BindingSource(dic, null);
+            this.combUpdateTemplates.DisplayMember = "value";
+            this.combUpdateTemplates.ValueMember = "key";
+        }
+
+        /// <summary>
+        /// 绑定可更新的组件
+        /// </summary>
+        void bindComponentsUpdate()
+        {
+            Dictionary<string, string> dic = new Dictionary<string, string>();
+            if (canUpdateComponentStyles == null || canUpdateComponentStyles.Count < 1)
+            {
+                dic.Add("-1", "请选择");
+            }
+            else
+            {
+                dic.Add("0", "全部可更新组件");
+                foreach (var item in canUpdateComponentStyles)
+                {
+                    dic.Add(item.Code, $"{item.Name}({item.Code})组件，共{item.Styles.Length}套风格");
+                }
+            }
+            this.combUpdateComponents.DataSource = null;
+            this.combUpdateComponents.Items.Clear();
+            this.combUpdateComponents.DataSource = new BindingSource(dic, null);
+            this.combUpdateComponents.DisplayMember = "value";
+            this.combUpdateComponents.ValueMember = "key";
         }
 
         #endregion
 
-        #region 检测组件更新
+        #region 模板、组件数据处理
+
+        /// <summary>
+        /// 校正数据
+        /// </summary>
+        void checkData()
+        {
+            service = service ?? new SpecialService();
+
+            //获取库中的模板及皮肤
+            dbTemplateSkins = service.GetTemplatesSkins();
+            //获取库中的组件及风格
+            dbComponentStyles = service.GetComponentsStyles();
+
+            //获取本地所有模板及皮肤
+            localTemplateSkins = GetLocationTemplatesAtSkins();
+            //获取本地所有组件及风格
+            localComponentStyles = GetLocationComponentsAtStyles();
+
+            resolveTemplates();
+            resolveComponents();
+        }
 
         /// <summary>
         /// 获取本地模板及对应模板皮肤键值集合
@@ -275,120 +443,82 @@ namespace TemplateFactory
         }
 
         /// <summary>
-        /// 检测模板更新信息
+        /// 分解出可新增和可更新的模板及皮肤
         /// </summary>
-        void checkTemplateUpdates()
+        void resolveTemplates()
         {
-            udTemplateSkins = new List<TemplateModel>();
+            canInsertTemplateSkins = new List<TemplateModel>();
+            canUpdateTemplateSkins = new List<TemplateModel>();
 
-            var locTemplates = GetLocationTemplatesAtSkins();
-
-            foreach (var t in locTemplates)
+            foreach (var t in localTemplateSkins)
             {
-                TemplateSkin[] skins = null;
+                TemplateSkin[] insertSkins = null;
+                TemplateSkin[] updateSkins = null;
 
                 if (!dbTemplateSkins.ContainsKey(t.Code))
                 {
-                    skins = t.Skins;
+                    insertSkins = t.Skins;
                 }
                 else
                 {
-                    skins = t.Skins.Where(p => !dbTemplateSkins[t.Code].Contains(p.Code)).ToArray();
+                    insertSkins = t.Skins.Where(p => !dbTemplateSkins[t.Code].Contains(p.Code)).ToArray();//库中没有的可新增
+                    updateSkins = t.Skins.Where(p => dbTemplateSkins[t.Code].Contains(p.Code)).ToArray();//库中有的可更新
                 }
 
-                if (skins != null && skins.Length > 0)
+                if (insertSkins != null && insertSkins.Length > 0)
+                {
+                    var inItem = t.Clone();
+                    inItem.Skins = insertSkins;
+                    canInsertTemplateSkins.Add(inItem);
+                }
+
+                if (updateSkins != null && updateSkins.Length > 0)
                 {
                     var upItem = t.Clone();
-                    upItem.Skins = skins;
-                    udTemplateSkins.Add(upItem);
+                    upItem.Skins = updateSkins;
+                    canUpdateTemplateSkins.Add(upItem);
                 }
             }
-
-            bindTemplatesUpdates();
         }
 
         /// <summary>
-        /// 检测组件更新信息
+        /// 分解出可新增和可更新的组件及风格
         /// </summary>
-        void checkComponentsUpdates()
+        void resolveComponents()
         {
-            udComponentStyles = new List<ComponentModel>();
+            canInsertComponentStyles = new List<ComponentModel>();
+            canUpdateComponentStyles = new List<ComponentModel>();
 
-            var locComponents = GetLocationComponentsAtStyles();
-
-            foreach (var t in locComponents)
+            foreach (var t in localComponentStyles)
             {
-                ComponentStyle[] styles = null;
+                ComponentStyle[] insertStyles = null;
+                ComponentStyle[] updateStyles = null;
 
                 if (!dbComponentStyles.ContainsKey(t.Code))
                 {
-                    styles = t.Styles;
+                    insertStyles = t.Styles;
                 }
                 else
                 {
-                    styles = t.Styles.Where(p => !dbComponentStyles[t.Code].Contains(p.Code)).ToArray();
+                    insertStyles = t.Styles.Where(p => !dbComponentStyles[t.Code].Contains(p.Code)).ToArray();//库中没有的可新增
+                    updateStyles = t.Styles.Where(p => dbComponentStyles[t.Code].Contains(p.Code)).ToArray();//库中有的可更新
                 }
 
-                if (styles != null && styles.Length > 0)
+                if (insertStyles != null && insertStyles.Length > 0)
+                {
+                    var inItem = t.Clone();
+                    inItem.Styles = insertStyles;
+                    canInsertComponentStyles.Add(inItem);
+                }
+                if (updateStyles != null && updateStyles.Length > 0)
                 {
                     var upItem = t.Clone();
-                    upItem.Styles = styles;
-                    udComponentStyles.Add(upItem);
+                    upItem.Styles = updateStyles;
+                    canUpdateComponentStyles.Add(upItem);
                 }
             }
 
-            bindComponentsUpdates();
-        }
-
-        /// <summary>
-        /// 绑定可更新的模板
-        /// </summary>
-        void bindTemplatesUpdates()
-        {
-            Dictionary<string, string> dic = new Dictionary<string, string>();
-
-            if (udTemplateSkins == null || udTemplateSkins.Count < 1)
-            {
-                dic.Add("-1", "请选择");
-            }
-            else
-            {
-                dic.Add("0", "全部可更新模板");
-                foreach (var item in udTemplateSkins)
-                {
-                    dic.Add(item.Code, $"{item.Config.Name}({item.Code})模板，共{item.Skins.Length}套皮肤");
-                }
-            }
-            this.combUpdateTemplates.DataSource = null;
-            this.combUpdateTemplates.Items.Clear();
-            this.combUpdateTemplates.DataSource = new BindingSource(dic, null);
-            this.combUpdateTemplates.DisplayMember = "value";
-            this.combUpdateTemplates.ValueMember = "key";
-        }
-
-        /// <summary>
-        /// 绑定可更新的组件
-        /// </summary>
-        void bindComponentsUpdates()
-        {
-            Dictionary<string, string> dic = new Dictionary<string, string>();
-            if (udComponentStyles == null || udComponentStyles.Count < 1)
-            {
-                dic.Add("-1", "请选择");
-            }
-            else
-            {
-                dic.Add("0", "全部可更新组件");
-                foreach (var item in udComponentStyles)
-                {
-                    dic.Add(item.Code, $"{item.Name}({item.Code})组件，共{item.Styles.Length}套风格");
-                }
-            }
-            this.combUpdateComponents.DataSource = null;
-            this.combUpdateComponents.Items.Clear();
-            this.combUpdateComponents.DataSource = new BindingSource(dic, null);
-            this.combUpdateComponents.DisplayMember = "value";
-            this.combUpdateComponents.ValueMember = "key";
+            bindComponentsInsert();
         }
 
         #endregion
@@ -396,25 +526,25 @@ namespace TemplateFactory
         #region 按钮事件
 
         /// <summary>
-        /// 更新模板（入库） 
+        /// 模板入库
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void btnUpdateTemplates_Click(object sender, EventArgs e)
+        private void btnInsertTemplates_Click(object sender, EventArgs e)
         {
-            var tempCode = this.combUpdateTemplates.SelectedValue.ToString();
+            var tempCode = (this.combInsertTemplates.SelectedValue ?? "-1").ToString();
 
             if (tempCode == "-1")
             {
-                MessageBox.Show("请选择需要更新的模板！");
+                MessageBox.Show("请选择需要入库的模板！");
                 return;
             }
 
-            List<TemplateModel> data = udTemplateSkins;
+            List<TemplateModel> data = canInsertTemplateSkins;
 
             if (tempCode != "0")
             {
-                data = udTemplateSkins.Where(p => p.Code.Equals(tempCode, StringComparison.OrdinalIgnoreCase)).ToList();
+                data = canInsertTemplateSkins.Where(p => p.Code.Equals(tempCode, StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
             string err = null;
@@ -435,13 +565,11 @@ namespace TemplateFactory
             {
                 if (success)
                 {
-                    var codes = data.Select(p => p.Code).ToArray();
-                    udTemplateSkins = udTemplateSkins.Where(p => !codes.Contains(p.Code)).ToList();
-                    bindTemplatesUpdates();
+                    formDraw();
                 }
                 else
                 {
-                    err = "更新模板失败！";
+                    err = "添加模板失败！";
                 }
             }
 
@@ -451,30 +579,30 @@ namespace TemplateFactory
             }
             else
             {
-                MessageBox.Show("更新模板成功！");
+                MessageBox.Show("添加模板成功！");
             }
         }
 
         /// <summary>
-        /// 更新组件（入库）
+        /// 组件入库
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void btnUpdateComponents_Click(object sender, EventArgs e)
+        private void btnInsertComponents_Click(object sender, EventArgs e)
         {
-            var compCode = this.combUpdateComponents.SelectedValue.ToString();
+            var compCode = (this.combInsertComponents.SelectedValue ?? "-1").ToString();
 
             if (compCode == "-1")
             {
-                MessageBox.Show("请选择需要更新的组件！");
+                MessageBox.Show("请选择需要添加的组件！");
                 return;
             }
 
-            List<ComponentModel> data = udComponentStyles;
+            List<ComponentModel> data = canInsertComponentStyles;
 
             if (compCode != "0")
             {
-                data = udComponentStyles.Where(p => p.Code.Equals(compCode, StringComparison.OrdinalIgnoreCase)).ToList();
+                data = canInsertComponentStyles.Where(p => p.Code.Equals(compCode, StringComparison.OrdinalIgnoreCase)).ToList();
             }
             string err = null;
             bool success = false;
@@ -495,11 +623,133 @@ namespace TemplateFactory
             {
                 if (success)
                 {
-                    var codes = data.Select(p => p.Code).ToArray();
-                    udComponentStyles = udComponentStyles.Where(p => !codes.Contains(p.Code)).ToList();
-                    bindComponentsUpdates();
+                    formDraw();
                 }
                 else
+                {
+                    err = "添加组件失败！";
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(err))
+            {
+                MessageBox.Show(err);
+            }
+            else
+            {
+                MessageBox.Show("添加组件成功！");
+            }
+        }
+
+        /// <summary>
+        /// 模板更新
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnUpdateTemplates_Click(object sender, EventArgs e)
+        {
+            var tempCode = (this.combUpdateTemplates.SelectedValue ?? "-1").ToString();
+
+            if (tempCode == "-1")
+            {
+                MessageBox.Show("请选择需要更新的模板！");
+                return;
+            }
+
+            List<TemplateModel> data = canUpdateTemplateSkins;
+
+            if (tempCode != "0")
+            {
+                data = canUpdateTemplateSkins.Where(p => p.Code.Equals(tempCode, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            string err = null;
+            int rows = 0;
+            try
+            {
+                rows = service.UpdateTemplates(data);
+            }
+            catch (CustomException ex)
+            {
+                err = ex.Message;
+            }
+            catch (Exception ex)
+            {
+                err = $"程序异常，原因：{ex.Message}";
+            }
+            finally
+            {
+                if (rows > 0)
+                {
+                    formDraw();
+                }
+                else if (rows == 0)
+                {
+                    err = "模板库中已是最新！";
+                }
+                else if (string.IsNullOrWhiteSpace(err))
+                {
+                    err = "更新模板失败！";
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(err))
+            {
+                MessageBox.Show(err);
+            }
+            else
+            {
+                MessageBox.Show("更新模板成功！");
+            }
+        }
+
+        /// <summary>
+        /// 组件更新
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnUpdateComponents_Click(object sender, EventArgs e)
+        {
+            var compCode = (this.combUpdateComponents.SelectedValue ?? "-1").ToString();
+
+            if (compCode == "-1")
+            {
+                MessageBox.Show("请选择需要更新的组件！");
+                return;
+            }
+
+            List<ComponentModel> data = canUpdateComponentStyles;
+
+            if (compCode != "0")
+            {
+                data = canUpdateComponentStyles.Where(p => p.Code.Equals(compCode, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+            string err = null;
+            int rows = 0;
+
+            try
+            {
+                rows = service.UpdateComponents(data);
+            }
+            catch (CustomException ex)
+            {
+                err = ex.Message;
+            }
+            catch (Exception ex)
+            {
+                err = $"程序异常，原因：{ex.Message}";
+            }
+            finally
+            {
+                if (rows > 0)
+                {
+                    formDraw();
+                }
+                else if (rows == 0)
+                {
+                    err = "组件库中已是最新！";
+                }
+                else if (string.IsNullOrWhiteSpace(err))
                 {
                     err = "更新组件失败！";
                 }
@@ -516,43 +766,40 @@ namespace TemplateFactory
         }
 
         /// <summary>
-        /// 检测组件更新
+        /// 检测更新
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void btnCheckComponents_Click(object sender, EventArgs e)
+        private void btnCheckUpdate_Click(object sender, EventArgs e)
         {
-            checkComponentsUpdates();
-
-            int compCount = udComponentStyles.Count();
-            int compStyleCount = udComponentStyles.Sum(p => p.Styles.Count());
-
-            bool hasUpdates = compCount > 0;
-
-            string tips = hasUpdates ? $"有{compCount}个组件，{compStyleCount}套风格可以更新" : "已是最新！";
-
-            this.lbComponentsUpdateTips.Text = tips;
+            formDraw();
         }
 
+        #endregion
+
+        #region 目标库选择
         /// <summary>
-        /// 检测模板更新
+        /// 目标库选择
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void btnCheckTemplates_Click(object sender, EventArgs e)
+        void combDbLibs_SelectedValueChanged(object sender, EventArgs e)
         {
-            checkTemplateUpdates();
+            var connectString = ((KeyValuePair<string, string>)this.combDbLibs.SelectedItem).Key;
 
-            int tempCount = udTemplateSkins.Count();
-            int tempSkinCount = udTemplateSkins.Sum(p => p.Skins.Count());
+            if (connectString != "0")
+            {
+                this.btnCheckUpdate.Visible = true;
 
-            bool hasUpdates = tempCount > 0;
+                Connect.ConnectString = connectString;
 
-            string tips = hasUpdates ? $"有{tempCount}套模板，{tempSkinCount}套皮肤可以更新" : "已是最新！";
-
-            this.lbTemplateUpdateTips.Text = tips;
+                formDraw();
+            }
+            else
+            {
+                this.btnCheckUpdate.Visible = false;
+            }
         }
-
         #endregion
     }
 }

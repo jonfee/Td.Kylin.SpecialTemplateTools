@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Configuration;
 using Td.Kylin.Entity;
+using System;
 
 namespace TemplateFactory.Data
 {
@@ -8,8 +9,10 @@ namespace TemplateFactory.Data
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            var connection = ConfigurationManager.ConnectionStrings["DefaultConnectionString"].ConnectionString;
-            optionsBuilder.UseSqlServer(connection);
+            if (string.IsNullOrEmpty(Connect.ConnectString))
+                throw new ArgumentNullException(nameof(Connect.ConnectString));
+
+            optionsBuilder.UseSqlServer(Connect.ConnectString);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
