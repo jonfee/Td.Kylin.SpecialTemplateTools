@@ -302,65 +302,72 @@ namespace TemplateFactory
         {
             List<TemplateModel> list = new List<TemplateModel>();
 
-            //本地组件库根目录
-            string root = Path.Combine(AppContext.BaseDirectory, TEMPLATES_ROOT);
-
-            string[] templatesDirs = Directory.GetDirectories(root);
-
-            if (null != templatesDirs)
+            try
             {
-                //循环模板
-                foreach (var dir in templatesDirs)
+                //本地组件库根目录
+                string root = Path.Combine(AppContext.BaseDirectory, TEMPLATES_ROOT);
+
+                string[] templatesDirs = Directory.GetDirectories(root);
+
+                if (null != templatesDirs)
                 {
-                    //模板信息
-                    var fileTempConfig = Path.Combine(dir, TEMPLATE_FILE_CONFIG);
-                    var tempConfig = FileReader.Read<TemplateConfig>(fileTempConfig, encoding);
-
-                    //模板HTML
-                    var fileTempHtml = Path.Combine(dir, TEMPLATE_FILE_HTML);
-                    var tempHtml = FileReader.ReadToString(fileTempHtml, encoding);
-
-                    //模板组件
-                    var fileTempComponents = Path.Combine(dir, TEMPLATE_FILE_COMPONENTS);
-                    var tempComponents = FileReader.ReadToList<TemplateComponent>(fileTempComponents, encoding);
-
-                    //模板编号
-                    string templateCode = dir.Substring(dir.LastIndexOf('\\') + 1);
-
-                    //模板皮肤
-                    List<TemplateSkin> skins = null;
-
-                    //向下寻找模板皮肤
-                    string skinRoot = Path.Combine(dir, TEMPLATE_SKIN_FOLDERNAME);
-
-                    string[] skinsDirs = Directory.GetDirectories(skinRoot);
-
-                    if (null != skinsDirs)
+                    //循环模板
+                    foreach (var dir in templatesDirs)
                     {
-                        skins = new List<TemplateSkin>();
+                        //模板信息
+                        var fileTempConfig = Path.Combine(dir, TEMPLATE_FILE_CONFIG);
+                        var tempConfig = FileReader.Read<TemplateConfig>(fileTempConfig, encoding);
 
-                        foreach (var skinDir in skinsDirs)
+                        //模板HTML
+                        var fileTempHtml = Path.Combine(dir, TEMPLATE_FILE_HTML);
+                        var tempHtml = FileReader.ReadToString(fileTempHtml, encoding);
+
+                        //模板组件
+                        var fileTempComponents = Path.Combine(dir, TEMPLATE_FILE_COMPONENTS);
+                        var tempComponents = FileReader.ReadToList<TemplateComponent>(fileTempComponents, encoding);
+
+                        //模板编号
+                        string templateCode = dir.Substring(dir.LastIndexOf('\\') + 1);
+
+                        //模板皮肤
+                        List<TemplateSkin> skins = null;
+
+                        //向下寻找模板皮肤
+                        string skinRoot = Path.Combine(dir, TEMPLATE_SKIN_FOLDERNAME);
+
+                        string[] skinsDirs = Directory.GetDirectories(skinRoot);
+
+                        if (null != skinsDirs)
                         {
-                            //皮肤信息
-                            var fileSkinConfig = Path.Combine(skinDir, TEMPLATE_FILE_SKIN_CONFIG);
-                            var skin = FileReader.Read<TemplateSkin>(fileSkinConfig, encoding);
+                            skins = new List<TemplateSkin>();
 
-                            //皮肤编号
-                            skin.Code = skinDir.Substring(skinDir.LastIndexOf('\\') + 1);
+                            foreach (var skinDir in skinsDirs)
+                            {
+                                //皮肤信息
+                                var fileSkinConfig = Path.Combine(skinDir, TEMPLATE_FILE_SKIN_CONFIG);
+                                var skin = FileReader.Read<TemplateSkin>(fileSkinConfig, encoding);
 
-                            skins.Add(skin);
+                                //皮肤编号
+                                skin.Code = skinDir.Substring(skinDir.LastIndexOf('\\') + 1);
+
+                                skins.Add(skin);
+                            }
                         }
-                    }
 
-                    if (skins != null && skins.Count > 0) list.Add(new TemplateModel
-                    {
-                        Code = templateCode,
-                        HTML = tempHtml,
-                        Config = tempConfig,
-                        Components = tempComponents.ToArray(),
-                        Skins = skins.ToArray()
-                    });
+                        if (skins != null && skins.Count > 0) list.Add(new TemplateModel
+                        {
+                            Code = templateCode,
+                            HTML = tempHtml,
+                            Config = tempConfig,
+                            Components = tempComponents.ToArray(),
+                            Skins = skins.ToArray()
+                        });
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
 
             return list;
@@ -374,69 +381,76 @@ namespace TemplateFactory
         {
             List<ComponentModel> list = new List<ComponentModel>();
 
-            //本地组件库根目录
-            string root = Path.Combine(AppContext.BaseDirectory, COMPONENTS_ROOT);
-
-            string[] componentsDirs = Directory.GetDirectories(root);
-
-            if (null != componentsDirs)
+            try
             {
-                //循环组件
-                foreach (var dir in componentsDirs)
+                //本地组件库根目录
+                string root = Path.Combine(AppContext.BaseDirectory, COMPONENTS_ROOT);
+
+                string[] componentsDirs = Directory.GetDirectories(root);
+
+                if (null != componentsDirs)
                 {
-                    //组件信息
-                    var fileCompConfig = Path.Combine(dir, COMPONENT_FILE_CONFIG);
-                    var comp = FileReader.Read<ComponentModel>(fileCompConfig, encoding);
-
-                    //组件HTML
-                    var fileCompHtml = Path.Combine(dir, COMPONENT_FILE_HTML);
-                    comp.HTML = FileReader.ReadToString(fileCompHtml, encoding);
-
-                    //组件默认风格信息
-                    var fileCompDefStyle = Path.Combine(dir, COMPONENT_FILE_DEFAULTSTYLE);
-                    comp.DefaultStyle = FileReader.Read<ComponentDefaultStyle>(fileCompDefStyle, encoding);
-
-                    //组件编号
-                    comp.Code = dir.Substring(dir.LastIndexOf('\\') + 1);
-
-                    //组件风格
-                    List<ComponentStyle> styles = null;
-
-                    //向下寻找组件风格
-                    string skinRoot = Path.Combine(dir, COMPONENT_STYLE_FOLDERNAME);
-
-                    string[] stylesDirs = Directory.GetDirectories(skinRoot);
-
-                    if (null != stylesDirs)
+                    //循环组件
+                    foreach (var dir in componentsDirs)
                     {
-                        styles = new List<ComponentStyle>();
-                        foreach (var styleDir in stylesDirs)
+                        //组件信息
+                        var fileCompConfig = Path.Combine(dir, COMPONENT_FILE_CONFIG);
+                        var comp = FileReader.Read<ComponentModel>(fileCompConfig, encoding);
+
+                        //组件HTML
+                        var fileCompHtml = Path.Combine(dir, COMPONENT_FILE_HTML);
+                        comp.HTML = FileReader.ReadToString(fileCompHtml, encoding);
+
+                        //组件默认风格信息
+                        var fileCompDefStyle = Path.Combine(dir, COMPONENT_FILE_DEFAULTSTYLE);
+                        comp.DefaultStyle = FileReader.Read<ComponentDefaultStyle>(fileCompDefStyle, encoding);
+
+                        //组件编号
+                        comp.Code = dir.Substring(dir.LastIndexOf('\\') + 1);
+
+                        //组件风格
+                        List<ComponentStyle> styles = null;
+
+                        //向下寻找组件风格
+                        string skinRoot = Path.Combine(dir, COMPONENT_STYLE_FOLDERNAME);
+
+                        string[] stylesDirs = Directory.GetDirectories(skinRoot);
+
+                        if (null != stylesDirs)
                         {
-                            //风格信息
-                            var fileStyleConfig = Path.Combine(styleDir, COMPONENT_FILE_STYLE_CONFIG);
-                            var style = FileReader.Read<ComponentStyle>(fileStyleConfig, encoding);
+                            styles = new List<ComponentStyle>();
+                            foreach (var styleDir in stylesDirs)
+                            {
+                                //风格信息
+                                var fileStyleConfig = Path.Combine(styleDir, COMPONENT_FILE_STYLE_CONFIG);
+                                var style = FileReader.Read<ComponentStyle>(fileStyleConfig, encoding);
 
-                            //风格样式
-                            var fileCss = Path.Combine(styleDir, COMPONENT_FILE_STYLE_CSS);
-                            style.Css = FileReader.ReadToString(fileCss, encoding);
+                                //风格样式
+                                var fileCss = Path.Combine(styleDir, COMPONENT_FILE_STYLE_CSS);
+                                style.Css = FileReader.ReadToString(fileCss, encoding);
 
-                            //风格规则
-                            var fileRules = Path.Combine(styleDir, COMPONENT_FILE_STYLE_Rules);
-                            style.Rules = FileReader.ReadToString(fileRules, encoding);
+                                //风格规则
+                                var fileRules = Path.Combine(styleDir, COMPONENT_FILE_STYLE_Rules);
+                                style.Rules = FileReader.ReadToString(fileRules, encoding);
 
-                            //风格编号
-                            style.Code = styleDir.Substring(styleDir.LastIndexOf('\\') + 1);
+                                //风格编号
+                                style.Code = styleDir.Substring(styleDir.LastIndexOf('\\') + 1);
 
-                            styles.Add(style);
+                                styles.Add(style);
+                            }
+                        }
+
+                        if (styles != null && styles.Count > 0)
+                        {
+                            comp.Styles = styles.ToArray();
+                            list.Add(comp);
                         }
                     }
-
-                    if (styles != null && styles.Count > 0)
-                    {
-                        comp.Styles = styles.ToArray();
-                        list.Add(comp);
-                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
 
             return list;
