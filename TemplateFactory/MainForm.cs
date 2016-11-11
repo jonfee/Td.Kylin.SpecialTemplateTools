@@ -280,10 +280,22 @@ namespace TemplateFactory
         {
             service = service ?? new SpecialService();
 
-            //获取库中的模板及皮肤
-            dbTemplateSkins = service.GetTemplatesSkins();
-            //获取库中的组件及风格
-            dbComponentStyles = service.GetComponentsStyles();
+            try
+            {
+                //获取库中的模板及皮肤
+                dbTemplateSkins = service.GetTemplatesSkins();
+                //获取库中的组件及风格
+                dbComponentStyles = service.GetComponentsStyles();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                if (dbTemplateSkins == null) dbTemplateSkins = new Dictionary<string, string[]>();
+                if (dbComponentStyles == null) dbComponentStyles = new Dictionary<string, string[]>();
+            }
 
             //获取本地所有模板及皮肤
             localTemplateSkins = GetLocationTemplatesAtSkins();
@@ -581,7 +593,7 @@ namespace TemplateFactory
                 {
                     formDraw();
                 }
-                else
+                else if (string.IsNullOrEmpty(err))
                 {
                     err = "添加模板失败！";
                 }
@@ -639,7 +651,7 @@ namespace TemplateFactory
                 {
                     formDraw();
                 }
-                else
+                else if (string.IsNullOrWhiteSpace(err))
                 {
                     err = "添加组件失败！";
                 }
