@@ -1,0 +1,1 @@
+{"header":{"display":false,"modify":false,"length":0},"content":{"display":true,"modify":true,"search":{"maxnum":1},"sort":null,"filter":{"width":720,"height":280}},"footer":{"display":false,"modify":false,"length":0}}

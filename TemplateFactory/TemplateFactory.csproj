@@ -318,8 +318,60 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="resource\temp\components\coupon\config.txt" />
+    <Content Include="resource\temp\components\coupon\defaultstyle.txt" />
+    <Content Include="resource\temp\components\coupon\html.txt" />
+    <Content Include="resource\temp\components\coupon\style\default\config.txt" />
+    <Content Include="resource\temp\components\coupon\style\default\css.txt" />
+    <Content Include="resource\temp\components\coupon\style\default\rules.txt" />
+    <Content Include="resource\temp\components\coupon\style\说明.txt" />
+    <Content Include="resource\temp\components\foot-bar\config.txt" />
+    <Content Include="resource\temp\components\foot-bar\defaultstyle.txt" />
+    <Content Include="resource\temp\components\foot-bar\html.txt" />
+    <Content Include="resource\temp\components\foot-bar\style\default\config.txt" />
+    <Content Include="resource\temp\components\foot-bar\style\default\css.txt" />
+    <Content Include="resource\temp\components\foot-bar\style\default\rules.txt" />
+    <Content Include="resource\temp\components\foot-bar\style\说明.txt" />
+    <Content Include="resource\temp\components\goods-grid\config.txt" />
+    <Content Include="resource\temp\components\goods-grid\defaultstyle.txt" />
+    <Content Include="resource\temp\components\goods-grid\html.txt" />
+    <Content Include="resource\temp\components\goods-grid\style\def-col2\config.txt" />
+    <Content Include="resource\temp\components\goods-grid\style\def-col2\css.txt" />
+    <Content Include="resource\temp\components\goods-grid\style\def-col2\rules.txt" />
+    <Content Include="resource\temp\components\goods-grid\style\def-col3\config.txt" />
+    <Content Include="resource\temp\components\goods-grid\style\def-col3\css.txt" />
+    <Content Include="resource\temp\components\goods-grid\style\def-col3\rules.txt" />
+    <Content Include="resource\temp\components\goods-grid\style\说明.txt" />
+    <Content Include="resource\temp\components\single-image\config.txt" />
+    <Content Include="resource\temp\components\single-image\defaultstyle.txt" />
+    <Content Include="resource\temp\components\single-image\html.txt" />
+    <Content Include="resource\temp\components\single-image\style\w720h280\config.txt" />
+    <Content Include="resource\temp\components\single-image\style\w720h280\css.txt" />
+    <Content Include="resource\temp\components\single-image\style\w720h280\rules.txt" />
+    <Content Include="resource\temp\components\single-image\style\w720h430\config.txt" />
+    <Content Include="resource\temp\components\single-image\style\w720h430\css.txt" />
+    <Content Include="resource\temp\components\single-image\style\w720h430\rules.txt" />
+    <Content Include="resource\temp\components\single-image\style\说明.txt" />
+    <Content Include="resource\temp\components\top-bar\config.txt" />
+    <Content Include="resource\temp\components\top-bar\defaultstyle.txt" />
+    <Content Include="resource\temp\components\top-bar\html.txt" />
+    <Content Include="resource\temp\components\top-bar\style\default\config.txt" />
+    <Content Include="resource\temp\components\top-bar\style\default\css.txt" />
+    <Content Include="resource\temp\components\top-bar\style\default\rules.txt" />
+    <Content Include="resource\temp\components\top-bar\style\说明.txt" />
+    <Content Include="resource\temp\components\说明.txt" />
+    <Content Include="resource\temp\templates\template\components.txt" />
+    <Content Include="resource\temp\templates\template\config.txt" />
+    <Content Include="resource\temp\templates\template\html.txt" />
+    <Content Include="resource\temp\templates\template\skin\default\config.txt" />
+    <Content Include="resource\temp\templates\template\skin\说明.txt" />
+    <Content Include="resource\temp\templates\说明.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /e /s /k /v /i /y "$(ProjectDir)resource\*.*" "$(ProjectDir)$(OutDir)"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

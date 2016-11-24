@@ -1,0 +1,1 @@
+{"DefaultStyleId":50000001,"PreviewImage":"/special/components/top-bar/default.png","DefaultStyleConfig":"{\"header\":{\"display\":false,\"modify\":false,\"length\":0},\"content\":{\"display\":true,\"modify\":true,\"search\":null,\"sort\":null,\"filter\":null},\"footer\":{\"display\":false,\"modify\":false,\"length\":0}}"}

@@ -1,0 +1,1 @@
+{"ComponentId":500003,"ComponentType":30,"DefaultData":"{\"header\":{\"title\":\"商品栏目\"},\"content\":null,\"footer\":{\"text\":\"\"}}","Name":"普通商品"}

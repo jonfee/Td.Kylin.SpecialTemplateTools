@@ -1,0 +1,10 @@
+{"index":1,"TempComponentId":100000001,"ComponentId":500000,"StyleId":50000001,"DefaultData":"{\"header\":{\"title\":\"顶部导航\"},\"content\":null,\"footer\":{\"text\":\"\"}}"}
+{"index":2,"TempComponentId":100000002,"ComponentId":500001,"StyleId":50000101,"DefaultData":"{\"header\":{\"title\":\"头部图\"},\"content\":null,\"footer\":{\"text\":\"\"}}"}
+{"index":3,"TempComponentId":100000003,"ComponentId":500002,"StyleId":50000201,"DefaultData":"{\"header\":{\"title\":\"优惠券\"},\"content\":null,\"footer\":{\"text\":\"\"}}"}
+{"index":4,"TempComponentId":100000004,"ComponentId":500003,"StyleId":50000302,"DefaultData":"{\"header\":{\"title\":\"为您精选\"},\"content\":null,\"footer\":{\"text\":\"\"}}"}
+{"index":5,"TempComponentId":100000005,"ComponentId":500001,"StyleId":50000102,"DefaultData":"{\"header\":{\"title\":\"中部广告图\"},\"content\":null,\"footer\":{\"text\":\"\"}}"}
+{"index":6,"TempComponentId":100000006,"ComponentId":500003,"StyleId":50000301,"DefaultData":"{\"header\":{\"title\":\"商品栏目一\"},\"content\":null,\"footer\":{\"text\":\"\"}}"}
+{"index":7,"TempComponentId":100000007,"ComponentId":500003,"StyleId":50000301,"DefaultData":"{\"header\":{\"title\":\"商品栏目二\"},\"content\":null,\"footer\":{\"text\":\"\"}}"}
+{"index":8,"TempComponentId":100000008,"ComponentId":500003,"StyleId":50000301,"DefaultData":"{\"header\":{\"title\":\"商品栏目三\"},\"content\":null,\"footer\":{\"text\":\"\"}}"}
+{"index":9,"TempComponentId":100000009,"ComponentId":500003,"StyleId":50000301,"DefaultData":"{\"header\":{\"title\":\"商品栏目四\"},\"content\":null,\"footer\":{\"text\":\"\"}}"}
+{"index":10,"TempComponentId":100000010,"ComponentId":500004,"StyleId":50000401,"DefaultData":"{\"header\":{\"title\":\"底部规则说明\"},\"content\":null,\"footer\":{\"text\":\"自定义专题规则说明……\"}}"}

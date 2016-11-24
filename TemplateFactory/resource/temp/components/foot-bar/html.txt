@@ -1,0 +1,1 @@
+<div :id='data.pageComponentId' class='components foot-bar' :class='data.styleCode'> <div class='header' v-if='head.display'>{{head.title}}</div> <div class='container' v-if='content.display'>{{content.data}}</div> <div class='footer' v-if='foot.display'>{{foot.text}}</div> </div>

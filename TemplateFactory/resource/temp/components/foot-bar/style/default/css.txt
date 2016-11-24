@@ -1,0 +1,1 @@
+.components.foot-bar.default{background-color:transparent;padding:0.38889rem 0.44444rem;font-size:1em;line-height:1.5;color:#999}

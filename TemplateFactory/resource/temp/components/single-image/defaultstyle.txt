@@ -1,0 +1,1 @@
+{"DefaultStyleId":50000101,"PreviewImage":"/special/components/single-image/w720h430.png","DefaultStyleConfig":"{\"header\":{\"display\":false,\"modify\":false,\"length\":0},\"content\":{\"display\":true,\"modify\":true,\"search\":null,\"sort\":null,\"filter\":null},\"footer\":{\"display\":false,\"modify\":false,\"length\":0}}"}

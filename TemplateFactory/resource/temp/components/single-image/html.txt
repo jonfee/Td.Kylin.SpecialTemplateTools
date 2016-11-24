@@ -1,0 +1,1 @@
+<div :id='data.pageComponentId' class='components single-image' :class='data.styleCode'><div class='header' v-if='head.display'>{{head.title}}</div><div class='content' v-if='content.display'><a href='javascript:;' @click='formatlink'><img :src='imgsrc' alt='µ¥Í¼×é¼þ'></a></div><div class='footer' v-if='foot.display'>{{foot.text}}</div></div>

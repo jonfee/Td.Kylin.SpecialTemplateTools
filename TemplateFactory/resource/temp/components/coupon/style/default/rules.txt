@@ -1,0 +1,1 @@
+{"header":{"display":false,"modify":false,"length":0},"content":{"display":true,"modify":true,"search":{"maxnum":3},"sort":[{"value":"1","text":"按发布时间由近到远"},{"value":"2","text":"按发布时间由远到近"},{"value":"3","text":"按面值从低到高"},{"value":"4","text":"按面值从高到低"}],"filter":{"width":720,"height":430}},"footer":{"display":false,"modify":false,"length":0}}

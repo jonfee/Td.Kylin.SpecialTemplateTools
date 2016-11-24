@@ -1,0 +1,1 @@
+{"header":{"display":true,"modify":false,"length":6},"content":{"display":true,"modify":true,"search":{"maxnum":3},"sort":[{"value":1,"text":"按发布时间由近到远"},{"value":2,"text":"按发布时间由远到近"},{"value":3,"text":"按价格从低到高"},{"value":4,"text":"按价格从高到低"},{"value":5,"text":"按销量从高到低"},{"value":6,"text":"按销量从低到高"}],"filter":null},"footer":{"display":false,"modify":false,"length":0}}

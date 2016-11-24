@@ -1,0 +1,1 @@
+{"ComponentId":500004,"ComponentType":50,"DefaultData":"{\"header\":{\"title\":\"\"},\"content\":null,\"footer\":{\"text\":\"请输入文字\"}}","Name":"底部文本"}

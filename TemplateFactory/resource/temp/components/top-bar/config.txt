@@ -1,0 +1,1 @@
+{"ComponentId":500000,"ComponentType":40,"DefaultData":"{\"header\":{\"title\":\"\"},\"content\":null,\"footer\":{\"text\":\"\"}}","Name":"À¸Ä¿µ¼º½"}

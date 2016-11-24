@@ -1,0 +1,1 @@
+.components.single-image.w720h430{height:5.97222rem;width:100%;overflow:hidden;background-color:#fff}.components.single-image.w720h430 a{display:block;padding:0;margin:0}.components.single-image.w720h430 img{width:100%;vertical-align:bottom}
